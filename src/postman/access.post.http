@@ -1,0 +1,13 @@
+@url_dev=http://localhost:3055/v1/api
+
+
+###signup
+POST {{url_dev}}/shop/signup
+Content-Type: application/json
+x-api-key: 049673ebed8d1c6878e8f4e737416a286b89324383dde0734f147ef0f1983754926a62d09132dfa788c70bfbe2bf7237656bcafa190930fd36dbb1e4b523a1bf
+
+{
+    "name": "Vu Manh",
+    "email": "manhvu@gmail.com",
+    "password": "abc123"
+}
