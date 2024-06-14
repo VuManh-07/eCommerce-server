@@ -16,6 +16,7 @@ const {
   findProduct,
   updateProductById,
 } = require("../models/repositories/product.repo");
+const { insertInventory } = require("../models/repositories/inventory.repo");
 const { BadRequestError } = require("../core/error.response");
 const { updateNestedObjectParser } = require("../utils");
 
@@ -72,7 +73,7 @@ class ProductFactory {
     sort = "ctime",
     page = 1,
     filter = { isPublished: true },
-    select = ["product_name", "product_price", "product_thumb"],
+    select = ["product_name", "product_price", "product_thumb", "product_shop"],
   }) {
     return await findAllProducts({ limit, sort, page, filter, select });
   }
@@ -107,10 +108,18 @@ class Product {
   }
 
   async createProduct(product_id) {
-    return await product.create({
+    const newProduct = await product.create({
       ...this,
       _id: product_id,
     });
+    if (newProduct) {
+      await insertInventory({
+        productId: newProduct._id,
+        shopId: this.product_shop,
+        stock: this.product_quantity,
+      });
+    }
+    return newProduct;
   }
 
   async updateProduct(productId, bodyUpdate) {

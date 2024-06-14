@@ -78,8 +78,6 @@ class AccessService {
   };
 
   static handlerRefreshTokenV2 = async ({ refreshToken, user, keyStore }) => {
-    console.log(keyStore, "keyStore");
-    console.log(refreshToken, "keyStore");
     if (keyStore.refreshTokensUsed.includes(refreshToken)) {
       await KeyTokenService.deleteKeyById(user.userId);
       throw new ForbiddenError("Some wrong happend !! Please relogin");
@@ -127,8 +125,6 @@ class AccessService {
      4- get data return login
   */
   static login = async ({ email, password, refreshToken }) => {
-    console.log({ email, password, refreshToken });
-    console.log(1);
     // 1
     const foundShop = await findByEmail({ email });
     if (!foundShop) {
@@ -177,6 +173,9 @@ class AccessService {
   };
 
   static signUp = async ({ name, email, password }) => {
+    if (!name || !email || !password)
+      throw new BadRequestError("Attribute is empty");
+
     //step 1: check email exists??
     const holderShop = await shopModel.findOne({ email }).lean();
     if (holderShop) {

@@ -7,7 +7,11 @@ const {
   furniture,
 } = require("../product.model");
 const { Types } = require("mongoose");
-const { getSelectData, getUnSelectData } = require("../../utils");
+const {
+  getSelectData,
+  getUnSelectData,
+  convertToObjectIdMongodb,
+} = require("../../utils");
 
 const queryProduct = async ({ query, limit, skip }) => {
   return await product
@@ -81,7 +85,7 @@ const findAllProducts = async ({ limit, sort, page, filter, select }) => {
   return products;
 };
 
-const findProduct = async ({ product_id, unSelect }) => {
+const findProduct = async ({ product_id, unSelect = [] }) => {
   return await product.findById(product_id).select(getUnSelectData(unSelect));
 };
 
@@ -95,6 +99,29 @@ const updateProductById = async ({
   return await model.findByIdAndUpdate(productId, bodyUpdate, { new: isNew });
 };
 
+const checkProductByServer = async (products) => {
+  const results = await Promise.all(
+    products.map(async (product) => {
+      const foundProduct = await findProduct({
+        product_id: convertToObjectIdMongodb(product.productId),
+        unSelect: ["__v"],
+      });
+      if (foundProduct) {
+        return {
+          price: foundProduct.product_price,
+          quantity: product.quantity,
+          productId: product.productId,
+        };
+      } else {
+        // Xử lý trường hợp sản phẩm không được tìm thấy
+        return null;
+      }
+    })
+  );
+  // Loại bỏ các kết quả null (sản phẩm không tìm thấy)
+  return results.filter((result) => result !== null);
+};
+
 module.exports = {
   findAllDraftsForShop,
   findAllPublishForShop,
@@ -104,4 +131,5 @@ module.exports = {
   findAllProducts,
   findProduct,
   updateProductById,
+  checkProductByServer,
 };
