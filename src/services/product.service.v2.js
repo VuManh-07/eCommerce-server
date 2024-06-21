@@ -19,6 +19,7 @@ const {
 const { insertInventory } = require("../models/repositories/inventory.repo");
 const { BadRequestError } = require("../core/error.response");
 const { updateNestedObjectParser } = require("../utils");
+const NotificationService = require("../services/notification.service");
 
 //define Factory class to create product
 class ProductFactory {
@@ -117,6 +118,16 @@ class Product {
         productId: newProduct._id,
         shopId: this.product_shop,
         stock: this.product_quantity,
+      });
+
+      await NotificationService.pushNotiToSystem({
+        type: "SHOP-001",
+        receivedId: 1,
+        senderId: this.product_shop,
+        options: {
+          product_name: this.product_name,
+          shop_name: this.product_shop,
+        },
       });
     }
     return newProduct;

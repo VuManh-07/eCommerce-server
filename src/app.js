@@ -7,6 +7,12 @@ const { checkOverload } = require("./helpers/check.connect");
 const router = require("./routes");
 const app = express();
 
+//test
+// require("./tests/inventory.test");
+// const productTest = require("./tests/product.test");
+// setTimeout(() => productTest.purchaseProduct("user:001", 100), 2000);
+
+
 //init middlewares
 app.use(morgan("dev")); // khi dev, combined khi deploy product
 app.use(helmet());
